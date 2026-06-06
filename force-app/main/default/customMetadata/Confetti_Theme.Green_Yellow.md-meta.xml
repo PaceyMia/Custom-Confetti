@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Green Yellow</label>
+    <protected>false</protected>
+    <values>
+        <field>Color_1__c</field>
+        <value xsi:type="xsd:string">#005058</value>
+    </values>
+    <values>
+        <field>Color_2__c</field>
+        <value xsi:type="xsd:string">#fff200</value>
+    </values>
+    <values>
+        <field>Color_3__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Color_4__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Color_5__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>
