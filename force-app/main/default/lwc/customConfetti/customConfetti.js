@@ -7,10 +7,11 @@ export default class CustomConfetti extends LightningElement {
     @api triggerValue;
 
     _fieldPath;
-    _fields      = [];
-    _themeColors = null;
-    _recordReady = false;
-    _hasFired    = false;
+    _fields        = [];
+    _themeColors   = null;
+    _previousValue;
+    _initialized   = false;
+    _shouldFire    = false;
 
     // fieldPath setter keeps the wire fields array reactive
     @api
@@ -20,14 +21,13 @@ export default class CustomConfetti extends LightningElement {
         this._fields    = val ? [val] : [];
     }
 
-    // themeName setter resets state so a theme change can re-fire
+    // themeName setter clears cached colours so a theme change reloads them
     _themeName;
     @api
     get themeName() { return this._themeName; }
     set themeName(val) {
         this._themeName   = val;
         this._themeColors = null;
-        this._hasFired    = false;
     }
 
     // Load colours from the Confetti_Theme__mdt Custom Metadata record
@@ -39,22 +39,36 @@ export default class CustomConfetti extends LightningElement {
         }
     }
 
-    // Watch the configured field on the current record
+    // Watch the configured field and fire only on a transition INTO the trigger
+    // value — never on initial load, where the field may already match
     @wire(getRecord, { recordId: '$recordId', fields: '$_fields' })
     wiredRecord({ data }) {
-        if (data && this._fieldPath && this.triggerValue) {
-            const val = getFieldValue(data, this._fieldPath);
-            if (val != null && String(val) === String(this.triggerValue)) {
-                this._recordReady = true;
-                this._tryLaunch();
-            }
+        if (!data || !this._fieldPath || !this.triggerValue) {
+            return;
         }
+
+        const val = getFieldValue(data, this._fieldPath);
+        const isMatching = this._matchesTrigger(val);
+
+        if (!this._initialized) {
+            // First read of this record: just record the baseline, don't fire
+            this._initialized = true;
+        } else if (isMatching && !this._matchesTrigger(this._previousValue)) {
+            this._shouldFire = true;
+            this._tryLaunch();
+        }
+
+        this._previousValue = val;
     }
 
-    // Only launch when both the record condition and theme colours are ready
+    _matchesTrigger(value) {
+        return value != null && String(value) === String(this.triggerValue);
+    }
+
+    // Only launch once the field has transitioned to the trigger value AND theme colours are ready
     _tryLaunch() {
-        if (this._recordReady && this._themeColors && !this._hasFired) {
-            this._hasFired = true;
+        if (this._shouldFire && this._themeColors) {
+            this._shouldFire = false;
             // eslint-disable-next-line @lwc/lwc/no-async-operation
             setTimeout(() => this._launch(), 400);
         }
