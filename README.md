@@ -12,6 +12,7 @@ Colours are fully configurable through Custom Metadata records in Setup. No code
 |---|---|
 | `customConfetti` LWC | The invisible canvas overlay that renders the animation |
 | `ConfettiThemeController` | Apex class that reads colour themes from Custom Metadata |
+| `ConfettiThemeControllerTest` | Apex test class — gives 100% coverage on `ConfettiThemeController` so the package can be deployed straight to a production org |
 | `Confetti_Theme__mdt` | Custom Metadata Type for managing colour palettes |
 
 **Starter themes included:**
@@ -114,7 +115,7 @@ Fill in the three fields:
 
 1. Click **Save**
 2. Click **Activate** if prompted
-3. Navigate to a record in that state — confetti will fire on page load
+3. Open a record and change the watched field to the trigger value (e.g. move an Opportunity to **Closed Won**) and save — confetti fires the moment the value changes to match
 
 ---
 
@@ -146,20 +147,21 @@ Any colour picker or design tool will give you hex codes. A free web tool: [html
 
 ## How it works
 
-The component is invisible on screen — it renders as a transparent canvas that sits over the entire page. When the page loads:
+The component is invisible on screen — it renders as a transparent canvas that sits over the entire page.
 
 1. It reads the **Field API Path** and **Trigger Value** from the App Builder config
 2. It fetches the colour palette from the **Confetti Theme** Custom Metadata record
-3. It watches the current record's field value
-4. If the value matches the trigger, it fires a 4.8-second canvas animation with 220 confetti particles in the configured colours, then fades out
+3. It watches the current record's field value and remembers what it last was
+4. When that value **changes into** the Trigger Value, it fires a 4.8-second canvas animation with 220 confetti particles in the configured colours, then fades out
 
-The animation only fires once per page load. It does not repeat on scroll or interaction.
+Confetti only fires on a genuine change into the trigger value — simply opening or refreshing a record that already matches won't set it off. Move the field away from the trigger value and back again (e.g. reopen a Closed Won deal, then re-close it) and it fires again every time.
 
 ---
 
 ## Troubleshooting
 
 **Confetti does not appear**
+- Remember it only fires on a *change into* the trigger value — opening or refreshing a record that already matches won't set it off. Change the field away and back (or to the trigger value on a fresh record) to see it fire
 - Check the **Field API Path** is correct — it must include the object name, e.g. `Opportunity.StageName` not just `StageName`
 - Check the **Trigger Value** matches exactly, including capitalisation — `Closed Won` not `closed won`
 - Check the **Confetti Theme** developer name matches a `Confetti_Theme__mdt` record exactly
