@@ -4,6 +4,8 @@ A zero-dependency Lightning Web Component that fires a confetti animation on any
 
 Colours are fully configurable through Custom Metadata records in Setup. No code changes. No redeployment.
 
+📖 **[Full installation guide and walkthrough](https://paceymia.github.io/Salesforce-Guides/guides/confetti-lwc-install.html)**
+
 ---
 
 ## What's included
